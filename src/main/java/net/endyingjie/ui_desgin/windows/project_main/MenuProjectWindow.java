@@ -2,6 +2,7 @@ package net.endyingjie.ui_desgin.windows.project_main;
 
 import com.squareup.javapoet.*;
 import net.endyingjie.ui_desgin.Main;
+import net.endyingjie.ui_desgin.configs.Config;
 import net.endyingjie.ui_desgin.manager.SlotGroupManage;
 import net.endyingjie.ui_desgin.manager.SlotManager;
 import net.endyingjie.ui_desgin.manager.interface_manager.SimpleSlotInformation;
@@ -78,6 +79,7 @@ public final class MenuProjectWindow extends JFrame {
     private int nowIndexSlotGroup  =0;
     private final ArrayList<SlotGroupLabel> slotGroups =new ArrayList<>();
     private final ArrayList<Runnable> slotGroupSet =new ArrayList<>();
+    private final PersonalizedButton SynchronousSlotButton = new PersonalizedButton(lang.getContent("synchronous_slot_button"));
     public MenuProjectWindow(String project_name, VersionForge version,boolean isoVisible) {
         super(lang.getContent("menu_project_title").concat("-").concat(project_name).concat("-").concat(version.toString()).concat("-").concat(lang.getContent("MainWindowTitle")));
         this.MainPaintingArea.setLayout(null);
@@ -337,6 +339,11 @@ public final class MenuProjectWindow extends JFrame {
                 }
             }
         });
+        this.SynchronousSlotButton.setBounds(0,300,300,30);
+        this.SynchronousSlotButton.addActionListener(event-> {
+            SynchronousSlotJDialog window = new SynchronousSlotJDialog(this);
+            window.setVisible(true);
+        });
         this.inputSlotX.setBounds(30,120,120,30);
         this.inputSlotY.setBounds(180,120,120,30);
         JLabel XLabel = new JLabel(lang.getContent("X:"),JLabel.CENTER);
@@ -420,7 +427,7 @@ public final class MenuProjectWindow extends JFrame {
                             if(inventorySlotLabel.getType()== SlotType.Inventory) projectNameMethodBuilder.addStatement("this.addSlot(new Slot(inventory,$L,$L+TexturesX,$L+TexturesY))",inventorySlotLabel.getIndex(),inventorySlotLabel.getSlotX(),inventorySlotLabel.getSlotY());
                         }
                         for(SlotLabel slot:this.slots){
-                           if(slot.getType() == SlotType.OutPutSlot) projectNameMethodBuilder.addStatement("this.addSlot(new OutputSlot(outputContainer,$L,$L+TexturesX,$L+TexturesY))",slot.getIndex(),slot.getSlotY(),slot.getSlotY());
+                           if(slot.getType() == SlotType.OutPutSlot) projectNameMethodBuilder.addStatement("this.addSlot(new OutputSlot(outputContainer,$L,$L+TexturesX,$L+TexturesY))",slot.getIndex(),slot.getSlotX(),slot.getSlotY());
                         }
                         FieldSpec outputContainer = FieldSpec.builder(ClassName.get("net.minecraft.world","SimpleContainer"),"outputContainer")
                                 .addModifiers(Modifier.PRIVATE)
@@ -463,7 +470,7 @@ public final class MenuProjectWindow extends JFrame {
                                             .addModifiers(Modifier.PRIVATE)
                                             .addModifiers(Modifier.FINAL)
                                             .initializer("new SimpleContainer($L)",information.getWeightSlot()*information.getHeightSlot()).build());
-                                    projectNameMethodBuilder.addCode("for(int x=0;x<$L;++x){\nfor(int y=0;y<$L;++y){\nthis.addSlot(new Slot(containerSlotGroup"+containerNumber+",x*y+x,x*18,y*18));\n}\n}",information.getHeightSlot(),information.getWeightSlot());
+                                    projectNameMethodBuilder.addCode("for(int x=0;x<$L;++x){\nfor(int y=0;y<$L;++y){\nthis.addSlot(new Slot(containerSlotGroup"+containerNumber+",$L+x*y+x+TexturesX,$L+x*18+TexturesY,y*18));\n}\n}",information.getHeightSlot(),information.getWeightSlot(),information.getWeightSlot(),information.getHeightSlot());
                             ++containerNumber;
                         }
                         MethodSpec projectNameMethod = projectNameMethodBuilder.build();
@@ -531,6 +538,7 @@ public final class MenuProjectWindow extends JFrame {
                 outputSlot.newSetLocation(outputSlot2.getSlotX(),outputSlot2.getSlotY());
             }
         });
+
         this.copySlotButton.setBounds(0,240,300,30);
         this.configPanel.add(copySlotButton);
         this.configPanel.add(this.DetailTweaksOpen);
@@ -538,6 +546,7 @@ public final class MenuProjectWindow extends JFrame {
         this.configPanel.add(rightLocationButton);
         this.configPanel.add(YLabel);
         this.configPanel.add(XLabel);
+        this.configPanel.add(SynchronousSlotButton);
         this.configPanel.add(this.inputSlotX);
         this.configPanel.add(this.inputSlotY);
         MainPaintingArea.setBounds(((this.getWidth()-300)-this.getHeight())/2,0,this.getHeight(),this.getHeight());
@@ -697,6 +706,185 @@ public final class MenuProjectWindow extends JFrame {
         }
     }
 
+    private static final class SynchronousSlotJDialog extends JDialog{
+        private static final Color background = new Color(0x878686);
+        private final PersonalizedTextField inputSlotOne = new PersonalizedTextField("0");
+        private final PersonalizedTextField inputSlotTwo = new PersonalizedTextField("0");
+        private int slotsFirst=0;
+        private int slotsLast=0;
+        private boolean slotsEmpty = false;
+        private final JComboBox<SlotType> slotTypeChoose  = new JComboBox<>();
+        private final PersonalizedButton rightSlotsButton = new PersonalizedButton(lang.getContent("right_slots_button"));
+        private static final JLabel xTip = new JLabel("X:",JLabel.CENTER);
+        private static final JLabel yTip = new JLabel("Y:",JLabel.CENTER);
+        private final PersonalizedTextField inputX = new PersonalizedTextField("0");
+        private final PersonalizedTextField inputY = new PersonalizedTextField("0");
+        private final PersonalizedButton copySlotsButton = new PersonalizedButton(lang.getContent("copy_slots_button"));
+        private final PersonalizedButton rightLocationButton = new PersonalizedButton(lang.getContent("right_location_slots_button"));
+        private static final JLabel indexTip = new JLabel(lang.getContent("index_tip"),JLabel.CENTER);
+        private ArrayList<SlotLabel> slots = new ArrayList<>();
+        static{
+            xTip.setBounds(0,90,30,30);
+            yTip.setBounds(150,90,30,30);
+            xTip.setForeground(Color.WHITE);
+            yTip.setForeground(Color.WHITE);
+            indexTip.setBounds(0,0,60,30);
+            indexTip.setForeground(Color.WHITE);
+        }
+        public SynchronousSlotJDialog(MenuProjectWindow window){
+            super(window,lang.getContent("synchronous_slot_window"),false);
+            this.setBounds(Config.screenSize.width/2-150,Config.screenSize.height/2-200,300,500);
+            this.setLayout(null);
+            this.getContentPane().setBackground(background);
+            this.inputSlotOne.setBounds(60,0,120,30);
+            this.inputSlotTwo.setBounds(180,0,120,30);
+            this.rightSlotsButton.setBounds(0,60,300,30);
+            this.slotTypeChoose.setBounds(0,30,300,30);
+            this.slotTypeChoose.setBackground(new Color(0x3D3D3D));
+            this.slotTypeChoose.setForeground(Color.WHITE);
+            for(SlotType type:SlotType.values()){
+                slotTypeChoose.addItem(type);
+            }
+            this.rightSlotsButton.addActionListener(event->{
+                if(Integer.parseInt(inputSlotOne.getText())>=0&&Integer.parseInt(inputSlotTwo.getText())>=0){
+                    if(Integer.parseInt(inputSlotTwo.getText())<Integer.parseInt(inputSlotOne.getText())){
+                        this.slotsFirst = Integer.parseInt(inputSlotTwo.getText());
+                        this.slotsLast= Integer.parseInt(inputSlotOne.getText());
+                    }else if(Integer.parseInt(inputSlotTwo.getText())>Integer.parseInt(inputSlotOne.getText())){
+                        this.slotsFirst = Integer.parseInt(inputSlotOne.getText());
+                        this.slotsLast= Integer.parseInt(inputSlotTwo.getText());
+                    }else {
+                        this.slotsFirst = 0;
+                        this.slotsLast= 0;
+                        this.slotsEmpty = true;
+                    }
+                }else window.logger.warning("Please write more than 0 number");
+                if(!slotsEmpty){
+                    ArrayList<SlotLabel> slots2 = new ArrayList<>();
+                    SlotType type = (SlotType)this.slotTypeChoose.getSelectedItem();
+                    for(int i= slotsFirst;i<=slotsLast;i++){
+                        System.out.println("hello");
+                        try{
+                           switch (type){
+                               case DefaultSlot:
+                                   if(window.getSlot(i)!=null) {
+                                       slots2.add(window.getSlot(i));
+                                       window.logger.info("Default Slot"+i+" is right");
+                                   }
+                                   else window.logger.warning("not find Default Slot");
+                                   break;
+                               case OutPutSlot:
+                                   if(window.getOutputSlot(i)!=null) {
+                                       slots2.add(window.getOutputSlot(i));
+                                       window.logger.info("Output Slot"+i+" is right");
+                                   }
+                                   else window.logger.warning("not find Output Slot");
+                                   break;
+                               case Inventory:
+                                   if(window.getInventorySlot(i)!=null) {
+                                       slots2.add(window.getInventorySlot(i));
+                                       window.logger.info("Inventory"+i+" is right");
+                                   }else window.logger.warning("not find Inventory Slot");
+                                   break;
+                               default:
+                                   if(window.getSlot(i)!=null) {
+                                       slots2.add(window.getSlot(i));
+                                       window.logger.info("Default Slot"+i+" is right");
+                                   }
+                                   else window.logger.warning("not find Default Slot");
+                           }
+                        } catch (NullPointerException e) {
+                            window.logger.warning("not find slots");
+                            break;
+                        }
+                    }
+                    this.slots = slots2;
+                }
+
+            });
+            this.inputX.setBounds(30,90,120,30);
+            this.inputY.setBounds(180,90,120,30);
+            this.rightLocationButton.addActionListener(event->{
+                try{
+                    for (SlotLabel slot : slots) {
+                        slot.newSetLocation(slot.getSlotX() + Integer.parseInt(this.inputX.getText()), slot.getSlotY() + Integer.parseInt(this.inputY.getText()));
+                        window.logger.info("right slot"+slot.getIndex()+" location is ok");
+                    }
+                    this.inputX.setText("0");
+                    this.inputY.setText("0");
+                } catch (NumberFormatException e) {
+                    window.logger.warning("Is not number");
+                }
+            });
+            copySlotsButton.addActionListener(event->{
+                SlotType type = slots.get(0).getType();
+                int index = 0;
+                for(SlotLabel slot :slots){
+                    switch (type){
+                        case DefaultSlot:
+                            ++index;
+                            window.addSlot(new SimpleSlotInformation(slot.getSlotX(),slot.getSlotY(),slots.get(slots.size()-1).getIndex()+index,slot.getType()));
+                            window.logger.info("copy slot is right"+index);
+                            break;
+                        case OutPutSlot:
+                            ++index;
+                            window.addOutput(new SimpleSlotInformation(slot.getSlotX(),slot.getSlotY(),slots.get(slots.size()-1).getIndex()+index,slot.getType()));
+                            window.logger.info("copy slot is right"+index);
+                            break;
+                        case Inventory:
+                            ++index;
+                            window.addInventorySlot(new SimpleSlotInformation(slot.getSlotX(),slot.getSlotY(),slots.get(slots.size()-1).getIndex()+index,slot.getType()));
+                            window.logger.info("copy slot is right"+index);
+                            break;
+                    }
+                }
+                this.inputSlotOne.setText(String.valueOf(slots.get(slots.size()-1).getIndex()+1));
+                this.inputSlotTwo.setText(String.valueOf(index+slots.get(slots.size()-1).getIndex()));
+                this.slotsFirst = slots.get(slots.size()-1).getIndex()+1;
+                this.slotsLast= index+slots.get(slots.size()-1).getIndex();
+                if(!slotsEmpty){
+                    ArrayList<SlotLabel> slots2 = new ArrayList<>();
+                    SlotType type2 = (SlotType)this.slotTypeChoose.getSelectedItem();
+                    for(int i= slotsFirst;i<=slotsLast;i++){
+                        try{
+                            switch (type2){
+                                case DefaultSlot:
+                                    slots2.add(window.getSlot(i));
+                                    window.logger.info("Default Slot is right");
+                                    break;
+                                case OutPutSlot:
+                                    slots2.add(window.getOutputSlot(i));
+                                    window.logger.info("Output Slot is right");
+                                    break;
+                                case Inventory:
+                                    slots2.add(window.getInventorySlot(i));
+                                    window.logger.info("Inventory is right");
+                                    break;
+                            }
+                        } catch (NullPointerException e) {
+                            window.logger.warning("not find slots");
+                            break;
+                        }
+                    }
+                    this.slots = slots2;
+                }
+            });
+            this.copySlotsButton.setBounds(0,150,300,30);
+            this.add(indexTip);
+            this.add(copySlotsButton);
+            this.add(rightSlotsButton);
+            this.rightLocationButton.setBounds(0,120,300,30);
+            this.add(rightLocationButton);
+            this.add(inputX);
+            this.add(inputY);
+            this.add(xTip);
+            this.add(yTip);
+            this.add(slotTypeChoose);
+            this.add(inputSlotOne);
+            this.add(inputSlotTwo);
+            this.setResizable(false);
+        }
+    }
     private static final class SlotGroupConfigurationJDialog extends JDialog{
         private static final Color background = new Color(0x888888);
         private final PersonalizedButton addNewSlotGroupButton  =new PersonalizedButton();

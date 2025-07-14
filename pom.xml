@@ -6,6 +6,10 @@
   <version>1.0-SNAPSHOT</version>
   <name>Archetype - MinecraftUiDesgin</name>
   <url>http://maven.apache.org</url>
+  <properties>
+    <java.version>1.8</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.alibaba.fastjson2</groupId>
@@ -17,7 +21,6 @@
       <artifactId>javapoet</artifactId>
       <version>1.13.0</version>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -28,6 +31,7 @@
         <configuration>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
+
           </descriptorRefs>
           <archive>
             <manifest>
@@ -43,7 +47,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><configuration><source>8</source><target>8</target></configuration></plugin>
     </plugins>
   </build>
 </project>

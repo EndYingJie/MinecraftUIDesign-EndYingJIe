@@ -28,7 +28,7 @@
   "export_java_file_button": "Export Java File",
   "detail_tweaks_open_button": "Detail Tweaks",
   "new_notice_title": "New Version Notice",
-  "new_notice_content": "<html>the update content:<br/>Fixed Slot grouping</html>",
+  "new_notice_content": "<html>Added the function of synchronizing item boxes, which can synchronize multiple item frames for executionThe<br/> \"Default Slot\" has been improved to make it easier to identify</html>",
   "slot_one_up": "Up a Slot",
   "slot_one_down": "Down a Slot",
   "slot_one_left": "Left a Slot",
@@ -42,5 +42,11 @@
   "slot_group_configuration_button": "Add Slot Group",
   "remove_slot_group_button": "Remove Slot Group",
   "right_slot_group_button": "Right Slot Group",
-  "right_slot_group_location_button": "Right Slot Group Location"
+  "right_slot_group_location_button": "Right Slot Group Location",
+  "synchronous_slot_window": "Synchronous Slot",
+  "right_location_slots_button": "Right Location Slots",
+  "right_slots_button": "Right Slots",
+  "copy_slots_button": "Copy Slots",
+  "index_tip": "Index:",
+  "synchronous_slot_button": "Synchronous Slot"
 }
