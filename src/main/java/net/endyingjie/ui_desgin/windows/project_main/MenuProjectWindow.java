@@ -252,14 +252,20 @@ public final class MenuProjectWindow extends JFrame {
                     SlotLabel slot = getSlot(NowIndex);
                     this.inputSlotY.setText(String.valueOf(slot.getSlotY()));
                     this.inputSlotX.setText(String.valueOf(slot.getSlotX()));
+                    this.logger.info("right Default Slot"+NowIndex+" is ok");
+                    System.out.println(slot.getType().toString()+"d");
                 }else if(this.slotTypeChoose.getSelectedItem()==SlotType.Inventory){
                     SlotLabel slot = getInventorySlot(NowIndex);
                     this.inputSlotY.setText(String.valueOf(slot.getSlotY()));
                     this.inputSlotX.setText(String.valueOf(slot.getSlotX()));
+                    this.logger.info("right Inventory Slot"+NowIndex+" is ok");
+                    System.out.println(slot.getType().toString()+"i");
                 }else if(this.slotTypeChoose.getSelectedItem()==SlotType.OutPutSlot){
                     SlotLabel slot = getOutputSlot(NowIndex);
                     this.inputSlotY.setText(String.valueOf(slot.getSlotY()));
                     this.inputSlotX.setText(String.valueOf(slot.getSlotX()));
+                    this.logger.info("right Output Slot"+NowIndex+" is ok");
+                    System.out.println(slot.getType().toString()+"o");
                 }
             } catch (Exception e) {
                 logger.warning("the you write is not integer or the number is very big");
@@ -358,12 +364,15 @@ public final class MenuProjectWindow extends JFrame {
             if(slotTypeChoose.getSelectedItem() == SlotType.Inventory){
                 SlotLabel nowLabel = getInventorySlot(NowIndex);
                 nowLabel.newSetLocation(Integer.parseInt(inputSlotX.getText()), Integer.parseInt(inputSlotY.getText()));
+                this.logger.info("right Inventory Slot location is ok");
             }else if(slotTypeChoose.getSelectedItem()==SlotType.DefaultSlot){
                 SlotLabel nowLabel = getSlot(NowIndex);
                 nowLabel.newSetLocation(Integer.parseInt(inputSlotX.getText()), Integer.parseInt(inputSlotY.getText()));
+                this.logger.info("right Default Slot location is ok");
             }else if(slotTypeChoose.getSelectedItem() ==SlotType.OutPutSlot){
                 SlotLabel nowLabel = getOutputSlot(NowIndex);
                 nowLabel.newSetLocation(Integer.parseInt(inputSlotX.getText()), Integer.parseInt(inputSlotY.getText()));
+                this.logger.info("right Output Slot location is ok");
             }
         });
         this.slotTip.setForeground(Color.WHITE);
@@ -538,7 +547,7 @@ public final class MenuProjectWindow extends JFrame {
                 outputSlot.newSetLocation(outputSlot2.getSlotX(),outputSlot2.getSlotY());
             }
         });
-
+        this.setIconImage(ResourceImageIcon.create("icon.png").getImage().getImage());
         this.copySlotButton.setBounds(0,240,300,30);
         this.configPanel.add(copySlotButton);
         this.configPanel.add(this.DetailTweaksOpen);
@@ -883,6 +892,42 @@ public final class MenuProjectWindow extends JFrame {
             this.add(inputSlotOne);
             this.add(inputSlotTwo);
             this.setResizable(false);
+            this.addWindowListener(new WindowListener() {
+                @Override
+                public void windowOpened(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    slots = new ArrayList<>();
+                }
+
+                @Override
+                public void windowClosed(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowIconified(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowDeiconified(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowActivated(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+
+                }
+            });
         }
     }
     private static final class SlotGroupConfigurationJDialog extends JDialog{
@@ -1092,8 +1137,10 @@ public final class MenuProjectWindow extends JFrame {
 
     public SlotLabel getSlot(int index){
         for(SlotLabel slot:this.slots){
-            if(index==slot.getIndex()){
-                return slot;
+            if(slot.getType() == SlotType.DefaultSlot){
+                if (index == slot.getIndex()) {
+                    return slot;
+                }
             }
         }
         return null;
