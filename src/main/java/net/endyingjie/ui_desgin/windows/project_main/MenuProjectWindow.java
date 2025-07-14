@@ -79,6 +79,8 @@ public final class MenuProjectWindow extends JFrame {
     private int nowIndexSlotGroup  =0;
     private final ArrayList<SlotGroupLabel> slotGroups =new ArrayList<>();
     private final ArrayList<Runnable> slotGroupSet =new ArrayList<>();
+    private int TextureX = 1;
+    private int TextureY = 1;
     private final PersonalizedButton SynchronousSlotButton = new PersonalizedButton(lang.getContent("synchronous_slot_button"));
     public MenuProjectWindow(String project_name, VersionForge version,boolean isoVisible) {
         super(lang.getContent("menu_project_title").concat("-").concat(project_name).concat("-").concat(version.toString()).concat("-").concat(lang.getContent("MainWindowTitle")));
@@ -221,7 +223,7 @@ public final class MenuProjectWindow extends JFrame {
                             SimpleMenuProject simpleMenuProject  =new SimpleMenuProject(
                                     project_name,mainImagePath,
                                     new SlotManager(slotsIM),
-                                    version,false,new SlotGroupManage(slotGroupsIM));
+                                    version,false,new SlotGroupManage(slotGroupsIM),this.TextureX,this.TextureY);
                             fileWriter.append(simpleMenuProject.toJson().toJSONString());
                             fileWriter.close();
                         } catch (IOException e) {
@@ -252,14 +254,20 @@ public final class MenuProjectWindow extends JFrame {
                     SlotLabel slot = getSlot(NowIndex);
                     this.inputSlotY.setText(String.valueOf(slot.getSlotY()));
                     this.inputSlotX.setText(String.valueOf(slot.getSlotX()));
+                    this.logger.info("right Default Slot"+NowIndex+" is ok");
+                    System.out.println(slot.getType().toString()+"d");
                 }else if(this.slotTypeChoose.getSelectedItem()==SlotType.Inventory){
                     SlotLabel slot = getInventorySlot(NowIndex);
                     this.inputSlotY.setText(String.valueOf(slot.getSlotY()));
                     this.inputSlotX.setText(String.valueOf(slot.getSlotX()));
+                    this.logger.info("right Inventory Slot"+NowIndex+" is ok");
+                    System.out.println(slot.getType().toString()+"i");
                 }else if(this.slotTypeChoose.getSelectedItem()==SlotType.OutPutSlot){
                     SlotLabel slot = getOutputSlot(NowIndex);
                     this.inputSlotY.setText(String.valueOf(slot.getSlotY()));
                     this.inputSlotX.setText(String.valueOf(slot.getSlotX()));
+                    this.logger.info("right Output Slot"+NowIndex+" is ok");
+                    System.out.println(slot.getType().toString()+"o");
                 }
             } catch (Exception e) {
                 logger.warning("the you write is not integer or the number is very big");
@@ -358,12 +366,15 @@ public final class MenuProjectWindow extends JFrame {
             if(slotTypeChoose.getSelectedItem() == SlotType.Inventory){
                 SlotLabel nowLabel = getInventorySlot(NowIndex);
                 nowLabel.newSetLocation(Integer.parseInt(inputSlotX.getText()), Integer.parseInt(inputSlotY.getText()));
+                this.logger.info("right Inventory Slot location is ok");
             }else if(slotTypeChoose.getSelectedItem()==SlotType.DefaultSlot){
                 SlotLabel nowLabel = getSlot(NowIndex);
                 nowLabel.newSetLocation(Integer.parseInt(inputSlotX.getText()), Integer.parseInt(inputSlotY.getText()));
+                this.logger.info("right Default Slot location is ok");
             }else if(slotTypeChoose.getSelectedItem() ==SlotType.OutPutSlot){
                 SlotLabel nowLabel = getOutputSlot(NowIndex);
                 nowLabel.newSetLocation(Integer.parseInt(inputSlotX.getText()), Integer.parseInt(inputSlotY.getText()));
+                this.logger.info("right Output Slot location is ok");
             }
         });
         this.slotTip.setForeground(Color.WHITE);
@@ -403,14 +414,14 @@ public final class MenuProjectWindow extends JFrame {
                                 .addStatement("return true")
                                 .build();
                         FieldSpec texturesX = FieldSpec.builder(int.class,"TexturesX")
-                                .initializer("0")
+                                .initializer("$L",this.TextureX)
                                 .addModifiers(Modifier.FINAL)
                                 .addModifiers(Modifier.PRIVATE)
                                 .addModifiers(Modifier.STATIC)
                                 .build();
 
                         FieldSpec texturesY = FieldSpec.builder(int.class,"TexturesY")
-                                .initializer("0")
+                                .initializer("$L",this.TextureY)
                                 .addModifiers(Modifier.FINAL)
                                 .addModifiers(Modifier.PRIVATE)
                                 .addModifiers(Modifier.STATIC)
@@ -470,7 +481,7 @@ public final class MenuProjectWindow extends JFrame {
                                             .addModifiers(Modifier.PRIVATE)
                                             .addModifiers(Modifier.FINAL)
                                             .initializer("new SimpleContainer($L)",information.getWeightSlot()*information.getHeightSlot()).build());
-                                    projectNameMethodBuilder.addCode("for(int x=0;x<$L;++x){\nfor(int y=0;y<$L;++y){\nthis.addSlot(new Slot(containerSlotGroup"+containerNumber+",$L+x*y+x+TexturesX,$L+x*18+TexturesY,y*18));\n}\n}",information.getHeightSlot(),information.getWeightSlot(),information.getWeightSlot(),information.getHeightSlot());
+                                    projectNameMethodBuilder.addCode("for(int x=0;x<$L;++x){\nfor(int y=0;y<$L;++y){\nthis.addSlot(new Slot(containerSlotGroup"+containerNumber+",x*y+x,$L+x*18+TexturesX,$L+y*18+TexturesY));\n}\n}",information.getHeightSlot(),information.getWeightSlot(),information.getCX(),information.getCY());
                             ++containerNumber;
                         }
                         MethodSpec projectNameMethod = projectNameMethodBuilder.build();
@@ -538,7 +549,7 @@ public final class MenuProjectWindow extends JFrame {
                 outputSlot.newSetLocation(outputSlot2.getSlotX(),outputSlot2.getSlotY());
             }
         });
-
+        this.setIconImage(ResourceImageIcon.create("icon.png").getImage().getImage());
         this.copySlotButton.setBounds(0,240,300,30);
         this.configPanel.add(copySlotButton);
         this.configPanel.add(this.DetailTweaksOpen);
@@ -825,16 +836,19 @@ public final class MenuProjectWindow extends JFrame {
                             ++index;
                             window.addSlot(new SimpleSlotInformation(slot.getSlotX(),slot.getSlotY(),slots.get(slots.size()-1).getIndex()+index,slot.getType()));
                             window.logger.info("copy slot is right"+index);
+                            ++window.indexSlotAll;
                             break;
                         case OutPutSlot:
                             ++index;
                             window.addOutput(new SimpleSlotInformation(slot.getSlotX(),slot.getSlotY(),slots.get(slots.size()-1).getIndex()+index,slot.getType()));
                             window.logger.info("copy slot is right"+index);
+                            ++window.outputIndexAll;
                             break;
                         case Inventory:
                             ++index;
                             window.addInventorySlot(new SimpleSlotInformation(slot.getSlotX(),slot.getSlotY(),slots.get(slots.size()-1).getIndex()+index,slot.getType()));
                             window.logger.info("copy slot is right"+index);
+                            ++window.indexSlotAllInventory;
                             break;
                     }
                 }
@@ -883,6 +897,42 @@ public final class MenuProjectWindow extends JFrame {
             this.add(inputSlotOne);
             this.add(inputSlotTwo);
             this.setResizable(false);
+            this.addWindowListener(new WindowListener() {
+                @Override
+                public void windowOpened(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    slots = new ArrayList<>();
+                }
+
+                @Override
+                public void windowClosed(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowIconified(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowDeiconified(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowActivated(WindowEvent e) {
+
+                }
+
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+
+                }
+            });
         }
     }
     private static final class SlotGroupConfigurationJDialog extends JDialog{
@@ -979,8 +1029,21 @@ public final class MenuProjectWindow extends JFrame {
         private final PersonalizedButton MoveSlotDistanceDown = new PersonalizedButton();
         private final PersonalizedButton MoveSlotDistanceLeft = new PersonalizedButton();
         private final PersonalizedButton MoveSlotDistanceRight = new PersonalizedButton();
+        private static final JLabel xTip = new JLabel("X:",JLabel.CENTER);
+        private static final JLabel yTip = new JLabel("Y:",JLabel.CENTER);
+        private final PersonalizedTextField inputTextureX= new PersonalizedTextField();
+        private final PersonalizedTextField inputTextureY = new PersonalizedTextField();
+        private final PersonalizedButton rightTextureLocation = new PersonalizedButton(lang.getContent("right_texture_location"));
+        static{
+            xTip.setForeground(Color.WHITE);
+            yTip.setForeground(Color.WHITE);
+            xTip.setBounds(0,30,30,30);
+            yTip.setBounds(200,30,30,30);
+        }
         public DetailTweaksJDialog(String title,MenuProjectWindow window){
             super(window,title,false);
+            this.inputTextureX.setText(String.valueOf(window.TextureX));
+            this.inputTextureY.setText(String.valueOf(window.TextureY));
             this.getContentPane().setBackground(BackGroundColor);
             this.setLayout(null);
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -1073,6 +1136,17 @@ public final class MenuProjectWindow extends JFrame {
                     window.logger.warning("Don't found the slot");
                 }
             });
+            this.rightTextureLocation.addActionListener(event->{
+                try{
+                    window.TextureX = Integer.parseInt(this.inputTextureX.getText());
+                    window.TextureY = Integer.parseInt(this.inputTextureY.getText());
+                }catch (NumberFormatException e){
+                    window.logger.warning("there are not number");
+                }
+            });
+            this.rightTextureLocation.setBounds(0,60,400,30);
+            this.inputTextureX.setBounds(30,30,170,30);
+            this.inputTextureY.setBounds(230,30,170,30);
             this.MoveSlotDistanceUp.setText(lang.getContent("slot_one_up"));
             this.MoveSlotDistanceDown.setText(lang.getContent("slot_one_down"));
             this.MoveSlotDistanceLeft.setText(lang.getContent("slot_one_left"));
@@ -1081,6 +1155,11 @@ public final class MenuProjectWindow extends JFrame {
             this.MoveSlotDistanceDown.setBounds(100,0,100,30);
             this.MoveSlotDistanceLeft.setBounds(200,0,100,30);
             this.MoveSlotDistanceRight.setBounds(300,0,100,30);
+            this.add(rightTextureLocation);
+            this.add(xTip);
+            this.add(yTip);
+            this.add(inputTextureX);
+            this.add(inputTextureY);
             this.add(MoveSlotDistanceUp);
             this.add(MoveSlotDistanceDown);
             this.add(MoveSlotDistanceLeft);
@@ -1092,8 +1171,10 @@ public final class MenuProjectWindow extends JFrame {
 
     public SlotLabel getSlot(int index){
         for(SlotLabel slot:this.slots){
-            if(index==slot.getIndex()){
-                return slot;
+            if(slot.getType() == SlotType.DefaultSlot){
+                if (index == slot.getIndex()) {
+                    return slot;
+                }
             }
         }
         return null;

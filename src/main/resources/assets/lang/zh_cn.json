@@ -27,7 +27,7 @@
   "import_json_project": "导入JSON形式项目",
   "export_java_file_button": "导出Java文件",
   "detail_tweaks_open_button": "细节调整",
-  "new_notice_content": "<html>更新内容:<br/>增加了同步物品框功能,可以同步多个物品框执行<br/>还对\"Default Slot\"进行了材质改进,更容易辨认</html>",
+  "new_notice_content": "<html>Bug修复内容&功能添加:<br/>对代码生成进行修复,并添加图片坐标统一移动功能</html>",
   "slot_one_up": "向上一格",
   "slot_one_down": "向下一格",
   "slot_one_left": "向左一格",
@@ -48,5 +48,6 @@
   "right_slots_button": "确定同步物品框",
   "copy_slots_button": "复制同步物品框",
   "index_tip": "索引:",
-  "synchronous_slot_button": "同步物品框"
+  "synchronous_slot_button": "同步物品框",
+  "right_texture_location": "确定图片将来坐标"
 }

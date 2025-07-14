@@ -172,6 +172,7 @@ public final class MainWindows extends JFrame {
             });
             thread.start();
         });
+        this.setIconImage(ResourceImageIcon.create("icon.png").getImage().getImage());
         importJSONProject.setBackground(new Color(0x292929));
         importJSONProject.setFont(new Font(Font.SERIF, Font.BOLD,24));
         importJSONProject.setForeground(Color.WHITE);

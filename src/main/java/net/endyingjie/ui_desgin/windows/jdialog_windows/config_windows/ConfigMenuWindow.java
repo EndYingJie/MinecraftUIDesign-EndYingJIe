@@ -28,6 +28,7 @@ public final class ConfigMenuWindow extends JDialog {
         for(VersionForge versionItem:VersionForge.values()){
             versionChoose.addItem(versionItem);
         }
+        versionChoose.setForeground(Color.WHITE);
         versionChoose.setBackground(Color.GRAY);
         versionChoose.setBounds(50,60,200,30);
         ProjectName.setBackground(Color.GRAY);
