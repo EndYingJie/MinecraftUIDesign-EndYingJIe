@@ -15,4 +15,6 @@ public interface MenuProject {
     default ProjectTypes getType(){
         return ProjectTypes.MenuProject;
     }
+    int getTextureX();
+    int getTextureY();
 }
