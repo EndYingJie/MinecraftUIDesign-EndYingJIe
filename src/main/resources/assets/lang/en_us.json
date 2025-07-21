@@ -28,7 +28,7 @@
   "export_java_file_button": "Export Java File",
   "detail_tweaks_open_button": "Detail Tweaks",
   "new_notice_title": "New Version Notice",
-  "new_notice_content": "<html>Added the function of synchronizing item boxes, which can synchronize multiple item frames for executionThe<br/> \"Default Slot\" has been improved to make it easier to identify</html>",
+  "new_notice_content": "<html>Bug fixes & function added:<br/> Fix code generation and add some little</html>",
   "slot_one_up": "Up a Slot",
   "slot_one_down": "Down a Slot",
   "slot_one_left": "Left a Slot",
@@ -48,5 +48,10 @@
   "right_slots_button": "Right Slots",
   "copy_slots_button": "Copy Slots",
   "index_tip": "Index:",
-  "synchronous_slot_button": "Synchronous Slot"
+  "synchronous_slot_button": "Synchronous Slot",
+  "right_texture_location": "Right texture will location",
+  "hide_slots_button": "Hide Slots",
+  "show_slots_button": "Show Slots",
+  "hide_main_texture_button": "Hide Main Texture",
+  "show_main_texture_button": "Show Main Texture"
 }
