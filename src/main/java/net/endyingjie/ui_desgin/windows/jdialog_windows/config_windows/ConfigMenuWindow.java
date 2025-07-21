@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 
 public final class ConfigMenuWindow extends JDialog {
+    private boolean isNotWrite = false;
     private static final LangReading lang = LangReading.create(LangReading.Model.LANG);
     public  ConfigMenuWindow(){
         super(Main.mainWindows,lang.getContent("config_menu_window"),true);
@@ -28,6 +29,7 @@ public final class ConfigMenuWindow extends JDialog {
         for(VersionForge versionItem:VersionForge.values()){
             versionChoose.addItem(versionItem);
         }
+        versionChoose.setForeground(Color.WHITE);
         versionChoose.setBackground(Color.GRAY);
         versionChoose.setBounds(50,60,200,30);
         ProjectName.setBackground(Color.GRAY);
@@ -67,7 +69,16 @@ public final class ConfigMenuWindow extends JDialog {
                         }else JOptionPane.showMessageDialog(null,lang.getContent("not_special_char"));
                     }
 
-                }else JOptionPane.showMessageDialog(null,lang.getContent("please_write"));
+                }else {
+                    if(!isNotWrite){
+                        JOptionPane.showMessageDialog(null, lang.getContent("please_write"));
+                        this.isNotWrite = true;
+                    }else {
+                        setVisible(false);
+                        Main.mainWindows.setVisible(false);
+                        MenuProjectWindow menuProjectWindow = new MenuProjectWindow("MyAbstractContainerMenu", version, true);
+                    }
+                }
         });
         this.add(versionLabel);
         this.add(rightButton);

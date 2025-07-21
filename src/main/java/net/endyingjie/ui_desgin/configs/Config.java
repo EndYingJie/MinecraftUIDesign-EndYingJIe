@@ -5,7 +5,7 @@ import java.util.Locale;
 
 public final class Config {
     public static Locale lang;
-    public static final String TheVersion = "0.1.71 Beta";
+    public static final String TheVersion = "0.1.81 Beta";
     public static LangConfig lang_enum;
     public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 }
